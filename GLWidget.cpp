@@ -14,15 +14,16 @@ GLWidget::GLWidget(QWidget *parent) :
     QGLWidget(parent)
 {
     connect(&timer, SIGNAL(timeout()), this, SLOT(updateGL()));
-    timer.start(8);
+    timer.start(10);
     time.start();
     frames = 0;
     renderBoxes = 420;
     GLCube *cube;
-    for(int j=0;j<30;j++)
-    for(int i=0;i<30;i++) {
+    int n = 90;
+    for(int j=0;j<n;j++)
+    for(int i=0;i<n;i++) {
         cube = new GLCube();
-        cube->setPosition(QVector3D(i-15, rand() % 3 - 5, j-15));
+        cube->setPosition(QVector3D(i-(n/2), rand() % 2 - 3, j-(n/2)));
         this->root.addObject(cube);
     }
 
@@ -56,21 +57,20 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+    int deltaT = time.elapsed();
+    time.restart();
+
     // move camera pov
-    this->cam.move(this->relMove);
+    this->cam.move(this->relMove, deltaT);
     this->cam.applyCamera();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3f(0.5, 1, 0.5);
     this->root.render();
 
-    this->frames++;
-    if(time.elapsed() >= 1000) {
-        int fps = this->frames / (time.elapsed() / 1000);
-        this->frames = 0;
-        time.restart();
-        this->updateFps(fps);
-    }
+
+    int fps = 1000 / time.elapsed();
+    this->updateFps(fps);
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -92,7 +92,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *evt)
     if(!firstMove) {
         qreal offX = (qreal)evt->x() - (this->width()/2);
         qreal offY = (qreal)evt->y() - (this->height()/2);
-        this->cam.mouseMove(offX/10.0, offY/-10.0);
+        this->cam.mouseMove(offX/-10.0, offY/-10.0);
     } else {
         firstMove = false;
     }

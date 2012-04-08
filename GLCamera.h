@@ -8,7 +8,7 @@ class GLCamera
 
 public:
     GLCamera();
-    void move(QVector3D relMove);
+    void move(QVector3D relMove, int msec);
     void applyCamera();
 
 public slots:
@@ -16,8 +16,10 @@ public slots:
 
 protected:
     QVector3D position;
-    QVector3D pointOfView;
-    QPointF oldMousePos;
+    QVector3D direction;
+    QVector3D right;
+    qreal verticalAngle;
+    qreal horizontalAngle;
 };
 
 #endif // GLCAMERA_H
